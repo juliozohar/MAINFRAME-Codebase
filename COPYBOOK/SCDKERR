@@ -1,0 +1,37 @@
+      ***************************************************************** 
+      *    COPYBOOK SCDKERR - VARIAVEIS PARA RETORNO DE ERRO            
+      *    HERC01.TEST.BOOK(SCDKERR)
+      ***************************************************************** 
+      * VRS0001 * 2017-12-29 * F6015650 *  IMPLANTACAO                  
+      ***************************************************************** 
+      *                                                                 
+       01  ERR-RECORD.                                                  
+           05  ERR-SECTION             PIC  X(006) VALUE SPACES.        
+           05  ERR-SEQ                 PIC  9(002) VALUE ZEROES.        
+           05  ERR-NM-CHP              PIC  X(032) VALUE SPACES.        
+           05  ERR-VL-CHP              PIC  X(032) VALUE SPACES.        
+           05  ERR-MSG                 PIC  X(080) VALUE SPACES.        
+           05  FILLER                  PIC  X(104) VALUE SPACES.        
+      *                                                                 
+      ***************************************************************** 
+      *                                                                 
+      *    OBJETIVO : DESCREVER ERROS                                   
+      *                                                                 
+      *                                                                 
+      *    DESCRICAO DOS CAMPOS                                         
+      *                                                                 
+      *      * ERR-SECTION : NOME DA SECTION NA QUAL OCORREU O ERRO.    
+      *                                                                 
+      *      * ERR-SEQ     : NUMERO SEQUENCIAL DO ERRO, DENTRO DA       
+      *                      SECTION.                                   
+      *                                                                 
+      *      * ERR-NM-CHP  : NOME DO CAMPO TESTADO QUE CAUSOU O ERRO.   
+      *                                                                 
+      *      * ERR-VAL-CHP : VALOR DO CAMPO TESTADO                     
+      *                                                                 
+      *      * ERR-MSG     : MENSAGEM PERSONALIZADA DE ERRO AO OPERADOR.
+      *                                                                 
+      *                                                                 
+      *    TAMANHO TOTAL DO COPYBOOK : 256 BYTES.                       
+      *                                                                 
+      ***************************************************************** 
