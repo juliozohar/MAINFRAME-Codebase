@@ -1,0 +1,11 @@
+      *****************************************************************
+      *    SCDK0001 - IDENTITICACAO DE VALORES PGT            
+      *    HERC01.TEST.BOOK(SCDK0001)
+      *****************************************************************
+        01  P0001-RECORD.                                              
+            03  P0001-DT-MVT           PIC  X(010) VALUE SPACES.       
+            03  P0001-CD-PRF-DEPE      PIC  9(009) VALUE ZEROES.       
+            03  P0001-CD-TITR          PIC  9(011) VALUE ZEROES.       
+            03  P0001-CD-CLI-BNFC      PIC  9(009) VALUE ZEROES.       
+            03  P0001-VL-DBT           PIC S9(015)V99 VALUE ZEROES.    
+            03  FILLER                 PIC  X(004) VALUE SPACES.       
