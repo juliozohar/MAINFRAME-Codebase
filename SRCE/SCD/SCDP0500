@@ -1,0 +1,524 @@
+      *---------------------------------------------------------------* 
+      * PROGRAMA..: SCDP0500                                            
+      * ANALISTA..: JULIO CESAR TORRES                                  
+      * AUTOR.....: JULIO CESAR TORRES                                  
+      * DATA......: 23/12/2017                                          
+      * OBJETIVO..: PROCESSAR FOLHA DE PAGAMENTO                        
+      * COMPILACAO: COBOL II                                            
+      *---------------------------------------------------------------* 
+      * VRS001 - 23/12/2017  F6015650  - IMPLANTACAO                    
+      *---------------------------------------------------------------* 
+      *------------------------                                         
+       IDENTIFICATION DIVISION.                                         
+      *------------------------                                         
+       PROGRAM-ID. SCDP0500.                                            
+      *                                                                 
+      *---------------------                                            
+       ENVIRONMENT DIVISION.                                            
+      *---------------------                                            
+      *                                                                 
+      *----------------------                                           
+       CONFIGURATION SECTION.                                           
+      *----------------------                                           
+      *                                                                 
+       SPECIAL-NAMES.                                                   
+           DECIMAL-POINT               IS COMMA.                        
+      *                                                                 
+      *----------------------                                           
+       INPUT-OUTPUT  SECTION.                                           
+      *----------------------                                           
+      *                                                                 
+       FILE-CONTROL.                                                    
+           SELECT SCDF0500             ASSIGN TO UT-S-SCDF0500.         
+                                                                        
+           SELECT SCDF0501             ASSIGN TO UT-S-SCDF0501.         
+                                                                        
+           SELECT SCDFPROV             ASSIGN TO UT-S-SCDFPROV.         
+                                                                        
+           SELECT SCDFMPAY             ASSIGN TO UT-S-SCDFMPAY.         
+                                                                        
+           SELECT SCDFREJT             ASSIGN TO UT-S-SCDFREJT.         
+      *                                          
+      *--------------                            
+       DATA DIVISION.                            
+      *--------------                            
+      *                                          
+      *-------------                             
+       FILE SECTION.                             
+      *-------------                             
+       FD  SCDF0500                              
+           LABEL RECORDS ARE OMITTED             
+           RECORDING F                           
+           RECORD    80                          
+           BLOCK     0.                          
+                                                 
+       01  F0500-RECORD  COPY SCDK0500.          
+      *                                          
+       FD  SCDF0501                              
+           LABEL RECORDS ARE OMITTED             
+           RECORDING F                           
+           RECORD    80                          
+           BLOCK     0.                          
+                                                 
+       01  F0501-RECORD  COPY SCDK0501.          
+                                                 
+       FD  SCDFPROV                              
+           LABEL RECORDS ARE OMITTED             
+           RECORDING F                           
+           RECORD    80                          
+           BLOCK     0.                          
+                                                 
+       01  FPROV-RECORD  COPY SCDKPROV.          
+                                                 
+       FD  SCDFMPAY                              
+           LABEL RECORDS ARE OMITTED             
+           RECORDING F                           
+           RECORD    80                          
+           BLOCK     0.                          
+                                                 
+       01  FMPAY-RECORD  COPY SCDKMPAY.          
+                                                 
+       FD  SCDFREJT                              
+           LABEL RECORDS ARE OMITTED                                  
+           RECORDING F                                                
+           RECORD    256                                              
+           BLOCK     0.                                               
+                                                                      
+       01  FREJT-RECORD                PIC  X(256).                   
+                                                                      
+      *------------------------                                       
+       WORKING-STORAGE SECTION.                                       
+      *------------------------                                       
+       77  CTE-INICIO-SS               PIC  X(040) VALUE              
+           '*** STORAGE SECTION COMECA AQUI ***'.                     
+       77  CTE-PROG                    PIC  X(018) VALUE              
+           '*** SCDP0500 ***'.                                        
+       77  CTE-VERS                    PIC  X(006) VALUE 'VRS001'.    
+       77  SBVERSAO                    PIC  X(008) VALUE 'SBVERSAO'.  
+      *                                                               
+       01  STL-IN-FIM-F0500            PIC  X(001) VALUE 'N'.         
+       01  STL-IN-FIN-FPROV            PIC  X(001) VALUE 'N'.         
+       01  STL-IN-FIN-FMPAY            PIC  X(001) VALUE 'N'.         
+       01  STL-ERR-VALIDA              PIC  X(001) VALUE 'N'.         
+                                                                      
+       01  CNT-F0500                   PIC  9(002) VALUE ZEROES.      
+       01  CNT-FPROV                   PIC  9(002) VALUE ZEROES.      
+       01  CNT-FMPAY                   PIC  9(002) VALUE ZEROES.      
+       01  CNT-REJEITO                 PIC  9(004) VALUE ZEROES.      
+      *                                                               
+       01  IDX-FPROV                   PIC  9(003) VALUE ZEROES.      
+       01  IDX-FMPAY                   PIC  9(003) VALUE ZEROES.      
+      *                                                               
+       01  MATCH-PAY                   PIC  X(001) VALUE SPACES.      
+           88 NO-MATCH-PAY                         VALUE 'X'.         
+       01  MATCH-PROV                  PIC  X(001) VALUE SPACES.      
+           88 NO-MATCH-PROV                        VALUE 'X'.         
+                                                                      
+       01  W0501-RECORD.                                              
+           03  W0501-CD-EMP            PIC  X(005).                   
+           03  W0501-NM-EMP            PIC  X(030).                   
+           03  W0501-CD-CAR            PIC  X(005).                   
+           03  W0501-HR-TRB            PIC  999V99.                   
+           03  W0501-QT-DEP            PIC  9(002).                   
+           03  W0501-CD-PROV           PIC  X(002).                   
+           03  W0501-VL-BRU            PIC  9999V99.                  
+           03  W0501-BS-CALC           PIC  9999V99.                  
+           03  W0501-IMPOSTO           PIC  9999V99.                  
+           03  W0501-PREVID            PIC  9999V99.                  
+           03  FILLER                  PIC  X(007).                   
+                                                                      
+       01  W-BASE-CALC                 PIC 9999V99.                   
+                                                                      
+       01  TABLE-FPROV.                                               
+           05  TAB-1-FPROV             OCCURS 10 TIMES                
+                                       INDEXED BY FPROV-INDEX.        
+               10  TAB-1-CD-PROV       PIC  X(002).                   
+               10  TAB-1-AL-IMPO       PIC  99V99.                    
+               10  TAB-1-AL-PREV       PIC  99V99.                    
+               10  TAB-1-AL-ISEN       PIC  99V99.                    
+               10  TAB-1-REV-DEP       PIC 999V99.                    
+                                                                      
+       01  TABLE-FMPAY.                                               
+           05  TAB-2-FMPAY             OCCURS 10 TIMES                
+                                       INDEXED BY FMPAY-INDEX.        
+               10  TAB-2-CD-CAR        PIC  X(005).                   
+               10  TAB-2-DESC-CAR      PIC  X(050).                   
+               10  TAB-2-TX-HOR        PIC  999V99.                   
+      *                                                               
+      * COPYBOOKS                                                     
+      *                                                               
+       01  ERR-RECORD  COPY SCDKERR.                                  
+      *                                                               
+      *-------------------                                            
+       PROCEDURE DIVISION.                                            
+      *-------------------                                            
+      *                                                               
+      *----------------------------------------                       
+       000000-ROTINA-PRINCIPAL         SECTION.                       
+      *----------------------------------------                       
+      *                                                               
+           DISPLAY '000000-ROTINA-PRINCIPAL'.                         
+                                                                      
+           PERFORM 100000-INICIALIZACAO.                              
+                                                                      
+           PERFORM 300000-TRATA-RECORD                         
+                   UNTIL  STL-IN-FIM-F0500 = 'S'.              
+                                                               
+           PERFORM 999999-CLOSE-FILES.                         
+                                                               
+           MOVE ZEROES                 TO RETURN-CODE.         
+           STOP RUN.                                           
+      *                                                        
+      *-----------                                             
+       000000-FIM.                                             
+      *-----------                                             
+           EXIT.                                               
+      *                                                        
+      *----------------------------------------                
+       100000-INICIALIZACAO            SECTION.                
+      *----------------------------------------                
+      *                                                        
+           DISPLAY '100000-INICIALIZACAO'.                     
+                                                               
+           PERFORM 100100-OPEN-FILES.                          
+                                                               
+           PERFORM 200100-PREPARE-TABLE-PROV                   
+                   UNTIL STL-IN-FIN-FPROV = 'S'.               
+                                                               
+           MOVE 0                      TO IDX-FPROV.           
+                                                               
+           PERFORM 999999-DISPLAY-PROV                         
+                   UNTIL IDX-FPROV     > CNT-FPROV.            
+                                                               
+           PERFORM 200200-PREPARE-TABLE-MPAY                   
+                   UNTIL STL-IN-FIN-FMPAY = 'S'.               
+                                                               
+           MOVE 0                      TO IDX-FMPAY.           
+                                                               
+           PERFORM 999999-DISPLAY-MPAY                         
+                   UNTIL IDX-FMPAY     > CNT-FMPAY.            
+      *                                                        
+      *                                                        
+      *-----------                                             
+       100000-FIM.                                             
+      *-----------                                             
+           EXIT.                                             
+      *                                                      
+      *----------------------------------------              
+       100100-OPEN-FILES               SECTION.              
+      *----------------------------------------              
+      *                                                      
+           DISPLAY '100100-OPEN-FILES'.                      
+                                                             
+           OPEN INPUT                  SCDF0500              
+                                       SCDFPROV              
+                                       SCDFMPAY.             
+                                                             
+           OPEN OUTPUT                 SCDF0501              
+                                       SCDFREJT.             
+      *                                                      
+      *-----------                                           
+       100100-FIM.                                           
+      *-----------                                           
+           EXIT.                                             
+      *                                                      
+      *----------------------------------------              
+       200000-LE-F0500                 SECTION.              
+      *----------------------------------------              
+      *                                                      
+           DISPLAY '200000-LE-F0500'.                        
+                                                             
+           READ SCDF0500                                     
+               AT END                                        
+                   MOVE 'S'            TO STL-IN-FIM-F0500.  
+                                                             
+           ADD +1                      TO CNT-F0500.         
+                                                             
+           PERFORM 200001-VALIDA-DADOS.                      
+                                                             
+      *                                                      
+      *-----------                                           
+       200000-FIM.                                           
+      *-----------                                           
+           EXIT.                                             
+      *                                                      
+      *----------------------------------------              
+       200001-VALIDA-DADOS             SECTION.                        
+      *----------------------------------------                        
+      *                                                                
+           MOVE 'N'                    TO STL-ERR-VALIDA.              
+           MOVE 200001                 TO ERR-SECTION.                 
+                                                                       
+           IF F0500-CD-EMP             IS EQUAL TO SPACES              
+               MOVE 'S'                TO STL-ERR-VALIDA               
+               MOVE  1                 TO ERR-SEQ                      
+               MOVE 'F0500-CD-EMP'     TO ERR-NM-CHP                   
+               MOVE  F0500-CD-EMP      TO ERR-VL-CHP                   
+               MOVE 'CODIGO DO EMPREGADO NAO INFORMADO'                
+                                       TO ERR-MSG                      
+               PERFORM 999000-ERROS.                                   
+                                                                       
+           IF F0500-NM-EMP             IS EQUAL TO SPACES              
+               MOVE 'S'                TO STL-ERR-VALIDA               
+               MOVE  2                 TO ERR-SEQ                      
+               MOVE 'F0500-NM-EMP'     TO ERR-NM-CHP                   
+               MOVE  F0500-NM-EMP      TO ERR-VL-CHP                   
+               MOVE 'NOME DO EMPREGADO NAO INFORMADO'                  
+                                       TO ERR-MSG                      
+               PERFORM 999000-ERROS.                                   
+                                                                       
+           IF F0500-CD-CAR             IS EQUAL TO SPACES              
+               MOVE 'S'                TO STL-ERR-VALIDA               
+               MOVE  3                 TO ERR-SEQ                      
+               MOVE 'F0500-CD-CAR'     TO ERR-NM-CHP                   
+               MOVE  F0500-CD-CAR      TO ERR-VL-CHP                   
+               MOVE 'CODIGO DO CARGO NAO INFORMADO'                    
+                                       TO ERR-MSG                      
+               PERFORM 999000-ERROS.                                   
+                                                                       
+           IF F0500-HR-TRB             IS NOT NUMERIC       OR         
+              F0500-HR-TRB             IS EQUAL TO ZEROES              
+               MOVE 'S'                TO STL-ERR-VALIDA               
+               MOVE  4                 TO ERR-SEQ                      
+               MOVE 'F0500-HR-TRB'     TO ERR-NM-CHP                   
+               MOVE  F0500-HR-TRB      TO ERR-VL-CHP                   
+               MOVE 'QUANTIDADE DE HORAS TRABALHADAS NAO INFORMADA OU' 
+                                       TO ERR-MSG                      
+                                                                     
+           IF F0500-QT-DEP             IS NOT NUMERIC                
+               MOVE 'S'                TO STL-ERR-VALIDA.            
+               MOVE  5                 TO ERR-SEQ                    
+               MOVE 'F0500-QT-DEP'     TO ERR-NM-CHP                 
+               MOVE  F0500-QT-DEP      TO ERR-VL-CHP                 
+               MOVE 'QUANTIDADE DE DEPENDENTES NAO INFORMADA OU '    
+                                        TO ERR-MSG                   
+               PERFORM 999000-ERROS.                                 
+                                                                     
+           IF F0500-CD-PROV            IS EQUAL TO  SPACES           
+               MOVE 'S'                TO STL-ERR-VALIDA.            
+               MOVE  6                 TO ERR-SEQ                    
+               MOVE 'F0500-CD-PROV'    TO ERR-NM-CHP                 
+               MOVE  F0500-CD-PROV     TO ERR-VL-CHP                 
+               MOVE 'SIGLA DA PROVINCIA NAO INFORMADA'               
+                                       TO ERR-MSG                    
+               PERFORM 999000-ERROS.                                 
+                                                                     
+           IF STL-ERR-VALIDA           IS EQUAL TO 'S'               
+               MOVE F0500-RECORD       TO FREJT-RECORD               
+               PERFORM 980000-GRAVA-REJEITO.                         
+                                                                     
+                                                                     
+      *                                                              
+      *-----------                                                   
+       200001-FIM.                                                   
+      *-----------                                                   
+           EXIT.                                                     
+      *                                                              
+      *----------------------------------------                      
+       200100-PREPARE-TABLE-PROV       SECTION.                      
+      *----------------------------------------                      
+      *                                                              
+           DISPLAY '200100-PREPARE-TABLE-PROV'.                      
+                                                                     
+           READ SCDFPROV                                             
+               AT END                                                
+                   MOVE 'S'            TO STL-IN-FIN-FPROV.          
+                                                                     
+           ADD +1                      TO CNT-FPROV.                 
+                                                                       
+           MOVE FPROV-CD-PROV          TO TAB-1-CD-PROV (CNT-FPROV).   
+           MOVE FPROV-AL-IMPO          TO TAB-1-AL-IMPO (CNT-FPROV).   
+           MOVE FPROV-AL-PREV          TO TAB-1-AL-PREV (CNT-FPROV).   
+           MOVE FPROV-AL-ISEN          TO TAB-1-AL-ISEN (CNT-FPROV).   
+           MOVE FPROV-REV-DEP          TO TAB-1-REV-DEP (CNT-FPROV).   
+      *                                                                
+      *-----------                                                     
+       200100-FIM.                                                     
+      *-----------                                                     
+           EXIT.                                                       
+      *                                                                
+      *----------------------------------------                        
+       200200-PREPARE-TABLE-MPAY       SECTION.                        
+      *----------------------------------------                        
+      *                                                                
+           DISPLAY '200100-PREPARE-TABLE-MPAY'.                        
+                                                                       
+           READ SCDFMPAY                                               
+               AT END                                                  
+                   MOVE 'S'            TO STL-IN-FIN-FMPAY.            
+                                                                       
+           ADD +1                      TO CNT-FMPAY.                   
+                                                                       
+           MOVE FMPAY-CD-CAR           TO TAB-2-CD-CAR   (CNT-FMPAY).  
+           MOVE FMPAY-DESC-CAR         TO TAB-2-DESC-CAR (CNT-FMPAY).  
+           MOVE FMPAY-TX-HOR           TO TAB-2-TX-HOR   (CNT-FMPAY).  
+      *                                                                
+      *-----------                                                     
+       200100-FIM.                                                     
+      *-----------                                                     
+           EXIT.                                                       
+      *                                                                
+      *----------------------------------------                        
+       300000-TRATA-RECORD             SECTION.                        
+      *----------------------------------------                        
+      *                                                                
+           DISPLAY '300000-TRATA-RECORD'.                              
+                                                                       
+           PERFORM 200000-LE-F0500.                                    
+                                                                       
+           IF STL-IN-FIM-F0500 NOT EQUAL 'S'                          
+                                                                      
+               PERFORM 400000-CALCULA-GANHOS.                         
+                                                                      
+               MOVE F0500-CD-EMP       TO W0501-CD-EMP                
+               MOVE F0500-NM-EMP       TO W0501-NM-EMP                
+               MOVE F0500-CD-CAR       TO W0501-CD-CAR                
+               MOVE F0500-QT-DEP       TO W0501-QT-DEP                
+               MOVE F0500-CD-PROV      TO W0501-CD-PROV               
+               MOVE F0500-HR-TRB       TO W0501-HR-TRB                
+               MOVE 1200,00            TO W0501-VL-BRU                
+               MOVE 1000,00            TO W0501-BS-CALC               
+               MOVE 255,00             TO W0501-IMPOSTO               
+               MOVE 40,00              TO W0501-PREVID                
+                                                                      
+               WRITE F0501-RECORD      FROM W0501-RECORD.             
+      *                                                               
+      *-----------                                                    
+       300000-FIM.                                                    
+      *-----------                                                    
+           EXIT.                                                      
+      *                                                               
+      *----------------------------------------                       
+       400000-CALCULA-GANHOS           SECTION.                       
+      *----------------------------------------                       
+      *                                                               
+           DISPLAY '400000-CALCULA-GANHOS'.                           
+                                                                      
+           PERFORM 400100-OBTEM-TAXA-HR.                              
+                                                                      
+           IF NO-MATCH-PAY                                            
+               DISPLAY 'TAXA HORARIA NAO DISPONIVEL'                  
+               GO TO 400000-FIM.                                      
+                                                                      
+           MULTIPLY F0500-HR-TRB BY TAB-2-TX-HOR (FMPAY-INDEX)        
+               GIVING W-BASE-CALC.                                    
+                                                                      
+           DISPLAY 'FUNCI: ' F0500-NM-EMP                             
+                   ' BRUTO: ' W-BASE-CALC.                            
+                                                                      
+      *                                                               
+      *-----------                                              
+       400000-FIM.                                              
+      *-----------                                              
+           EXIT.                                                
+      *                                                         
+      *----------------------------------------                 
+       400100-OBTEM-TAXA-HR            SECTION.                 
+      *----------------------------------------                 
+      *                                                         
+           DISPLAY '400100-OBTEM-TAXA-HR '.                     
+                                                                
+           MOVE SPACES                 TO MATCH-PAY             
+                                                                
+           SEARCH TAB-2-FMPAY                                   
+               AT END                                           
+                   MOVE 'X'            TO MATCH-PAY             
+               WHEN TAB-2-CD-CAR (FMPAY-INDEX) = F0500-CD-CAR   
+                   NEXT SENTENCE.                               
+                                                                
+      *                                                         
+      *-----------                                              
+       400000-FIM.                                              
+      *-----------                                              
+           EXIT.                                                
+      *                                                         
+      *----------------------------------------                 
+       980000-GRAVA-REJEITO            SECTION.                 
+      *----------------------------------------                 
+      *                                                         
+           DISPLAY '980000-GRAVA-REJEITO'.                      
+                                                                
+           ADD 1                       TO CNT-REJEITO.          
+           WRITE FREJT-RECORD          FROM F0500-RECORD.       
+                                                                
+      *                                                         
+      *-----------                                              
+       980000-FIM.                                              
+      *-----------                                              
+           EXIT.                                                
+      *                                                         
+      *----------------------------------------                 
+       999999-DISPLAY-PROV             SECTION.                        
+      *----------------------------------------                        
+      *                                                                
+           DISPLAY '999999-DISPLAY-PROV'.                              
+                                                                       
+           ADD +1                      TO IDX-FPROV.                   
+           DISPLAY 'TAB-1-CD-PROV : '     TAB-1-CD-PROV (IDX-FPROV).   
+           DISPLAY 'TAB-1-AL-IMPO : '     TAB-1-AL-IMPO (IDX-FPROV).   
+           DISPLAY 'TAB-1-AL-PREV : '     TAB-1-AL-PREV (IDX-FPROV).   
+           DISPLAY 'TAB-1-AL-ISEN : '     TAB-1-AL-ISEN (IDX-FPROV).   
+           DISPLAY 'TAB-1-REV-DEP : '     TAB-1-REV-DEP (IDX-FPROV).   
+      *                                                                
+      *-----------                                                     
+       999999-FIM.                                                     
+      *-----------                                                     
+           EXIT.                                                       
+      *                                                                
+      *----------------------------------------                        
+       999999-DISPLAY-MPAY             SECTION.                        
+      *----------------------------------------                        
+      *                                                                
+           DISPLAY '999999-DISPLAY-MPAY'.                              
+                                                                       
+           ADD +1                      TO IDX-FMPAY.                   
+           DISPLAY 'TAB-2-CD-CAR  : '     TAB-2-CD-CAR   (IDX-FMPAY).  
+           DISPLAY 'TAB-2-DESC-CAR: '     TAB-2-DESC-CAR (IDX-FMPAY).  
+           DISPLAY 'TAB-2-TX-HOR  : '     TAB-2-TX-HOR   (IDX-FMPAY).  
+      *                                                                
+      *-----------                                                     
+       999999-FIM.                                                     
+      *-----------                                                     
+           EXIT.                                                       
+      *                                                                
+      *----------------------------------------                        
+       999999-CLOSE-FILES              SECTION.                        
+      *----------------------------------------                        
+      *                                                                
+           DISPLAY '999999-CLOSE-FILES'.                               
+           CLOSE                       SCDF0500                        
+                                       SCDF0501                        
+                                       SCDFMPAY                        
+                                       SCDFPROV                         
+                                       SCDFREJT.                        
+      *                                                                 
+      *-----------                                                      
+       999999-FIM.                                                      
+      *-----------                                                      
+           EXIT.                                                        
+      *                                                                 
+      *----------------------------------------                         
+       999000-ERROS                    SECTION.                         
+      *----------------------------------------                         
+      *                                                                 
+           DISPLAY 'ERRO *** SECTION:' ERR-SECTION                      
+                   ' SEQUENCIAL:'      ERR-SEQ                          
+                   ' CAMPO: '          ERR-NM-CHP                       
+                   ' VALOR CAMPO:'     ERR-VL-CHP                       
+                   ' MENSAGEM:'        ERR-MSG.                         
+                                                                        
+           MOVE SPACES              TO ERR-SECTION                      
+                                       ERR-NM-CHP                       
+                                       ERR-VL-CHP                       
+                                       ERR-MSG.                         
+           MOVE ZEROES              TO ERR-SEQ.                         
+      *                                                                 
+      *-----------                                                      
+       999999-FIM.                                                      
+      *-----------                                                      
+           EXIT.                                                        
+      *                                                                 
+      *----------------------------------------------------------------*
+      *    FINAL PROGRAMA SCDP0500.                                     
+      *----------------------------------------------------------------*
+	  
