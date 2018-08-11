@@ -1,0 +1,22 @@
+//HERC01AS JOB CLASS=A,MSGCLASS=H,MSGLEVEL=(1,1),                 
+//             REGION=512K,NOTIFY=HERC01                          
+//UTLP0001     EXEC ASMFCL                                        
+//* 
+//*    HERC01.TEST.ASM(HELLO)
+//*
+//ASM.SYSUT1   DD UNIT=SYSDA                                      
+//ASM.SYSUT2   DD UNIT=SYSDA                                      
+//ASM.SYSUT3   DD UNIT=SYSDA                                      
+//ASM.SYSGO    DD UNIT=SYSDA                                      
+//*                                                               
+//ASM.SYSIN    DD *                                               
+UTLP0001 CSECT                                                    
+         USING UTLP0001,15                                        
+         SAVE (14,12)                                             
+         WTO 'FUCK YOU ALL IN THE WORLD'                          
+         RETURN (14,12),RC=0                                      
+         END                                                      
+/*                                                                
+//*                                                               
+//LKED.SYSLMOD DD DSN=HERC01.TEST.LOADLIB(UTLP0001),DISP=SHR      
+//     
