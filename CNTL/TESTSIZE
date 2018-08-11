@@ -1,0 +1,22 @@
+//HERC01A  JOB (001),                                                  
+//         'EXEC PGM 01',                                              
+//         CLASS=A,                                                    
+//         MSGCLASS=H,                                                 
+//         REGION=1024K,                                               
+//         NOTIFY=HERC01                                               
+//*        TYPRUN=SCAN                                                 
+//*                                                                    
+//* ****************************************************************** 
+//*    NOME : SCDJ0001                                                 
+//*                                                                    
+//*    DESC : EXECUTAR O PROGRAMA TESTSIZE                             
+//*                                                                    
+//*    HERC01.TEST.CNTL(TESTSIZE)                                                                
+//* ****************************************************************** 
+//*                                                                    
+//STEP001  EXEC PGM=TESTSIZE                                           
+//STEPLIB  DD DSN=HERC01.TEST.LOADLIB,DISP=SHR                         
+//SYSOUT   DD SYSOUT=*                                                 
+//SYSPRINT DD SYSOUT=*                                                 
+//SYSTPRT  DD SYSOUT=*                                                 
+//      
