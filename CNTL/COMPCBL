@@ -1,0 +1,29 @@
+//HERC01C  JOB (COBOL),                                                 
+//            'COMP PGM TESTSIZE',                                      
+//             CLASS=A,                                                 
+//             MSGCLASS=H,                                              
+//             REGION=9000K,TIME=1440,                                  
+//             MSGLEVEL=(1,1),                                          
+//             NOTIFY=HERC01                                            
+//*            TYPRUN=SCAN                                              
+//*                                                                     
+//* ------------------------------------------------------------------- 
+//*    COMPILACAO / LINKEDICAO                                          
+//*                                                                     
+//*    SUBSTITUA O PROGRAMA ATUAL PELO NOVO A COMPILAR COM A INSTRUCAO: 
+//*                                                                     
+//*        C 'PGMANT' 'PGMATU' ALL                                      
+//*                                                                     
+//*    SE FOR A PRIMEIRA COMPILACAO DO PROGRAMA (O OBJETO NAO EXISTE    
+//*    NA LOADLIB), EXECUTAR A PROC COBLINK; SE FOR UMA RECOMPILACAO,   
+//*    UTILIZAR A PROC COBRLINK                                         
+//*
+//*    HERC01.TEST.CNTL(COMPCBL)                                                                       
+//* ------------------------------------------------------------------- 
+//*                                                                     
+//COMPLINK     EXEC COMPJC,MBR='TESTSIZE',HLQ='HERC01'                  
+//COB.SYSIN    DD DSN=HERC01.TEST.SRCE(TESTSIZE),DISP=SHR               
+//*                                                                     
+//LKED.SYSLIB  DD DSNAME=SYS1.COBLIB,DISP=SHR                           
+//             DD DSNAME=SYS1.LINKLIB,DISP=SHR                          
+//             DD DSNAME=HERC01.TEST.LOADLIB,DISP=SHR                   
