@@ -1,0 +1,61 @@
+      *---------------------------------------------------------------* 
+      * PROGRAMA..: SCDP0001                                            
+      * ANALISTA..: JULIO CESAR TORRES                                  
+      * AUTOR.....: JULIO CESAR TORRES                                  
+      * DATA......: 16/12/2017                                          
+      * OBJETIVO..: EXIBIR MENSAGEM DE SAUDACAO                         
+      * COMPILACAO: COBOL II                                            
+      *---------------------------------------------------------------* 
+      * VRS001 - 16/12/2017  F6015650  - IMPLANTACAO                    
+      *---------------------------------------------------------------* 
+      *------------------------                                         
+       IDENTIFICATION DIVISION.                                         
+      *------------------------                                         
+       PROGRAM-ID. SCDP0001.                                            
+      *                                                                 
+      *---------------------                                            
+       ENVIRONMENT DIVISION.                                            
+      *---------------------                                            
+      *                                                                 
+      *--------------                                                   
+       DATA DIVISION.                                                   
+      *--------------                                                   
+      *------------------------                                         
+       WORKING-STORAGE SECTION.                                         
+      *------------------------                                         
+       77  CTE-INICIO-SS               PIC  X(040) VALUE                
+           '*** STORAGE SECTION COMECA AQUI ***'.                       
+       77  CTE-PROG                    PIC  X(018) VALUE                
+           '*** SCDP0001 ***'.                                          
+       77  CTE-VERS                    PIC  X(006) VALUE 'VRS001'.      
+       77  SBVERSAO                    PIC  X(008) VALUE 'SBVERSAO'.    
+      *                                                                 
+      *-------------------                                              
+       PROCEDURE DIVISION.                                              
+      *-------------------                                              
+      *----------------------------------------                         
+       000000-ROTINA-PRINCIPAL         SECTION.                         
+      *----------------------------------------                         
+      *                                                                 
+           DISPLAY 'OLA MUNDO, VERSAO MAINFRAME'                        
+                   CTE-PROG ' ' CTE-VERS.                               
+                                                                        
+                                                                        
+      *    CALL 'SCDP0002'                                              
+                                                                        
+                                                                        
+                                                                        
+           CALL 'UTLP0001'.                                             
+                                                                        
+           MOVE ZEROES                 TO RETURN-CODE.                  
+           STOP RUN.                                                    
+      *                                                                 
+      *-----------                                                      
+       000000-FIM.                                                      
+      *-----------                                                      
+           EXIT.                                                        
+      *                                                                 
+      *----------------------------------------------------------------*
+      *    FINAL PROGRAMA SCDP0001.                                     
+      *----------------------------------------------------------------*
+	  
