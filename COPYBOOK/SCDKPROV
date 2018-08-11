@@ -1,0 +1,16 @@
+      ***************************************************************** 
+      *    SCDKPROV - ARQUIVO MASTER DE PROVINCIAS             
+      *    HERC01.TEST.BOOK(SCDKPROV)                                                              
+      *                                                                 
+      *                                TAMANHO : 80 BYTES               
+      ***************************************************************** 
+       01  FPROV-RECORD.                                                
+           03  FPROV-CD-PROV           PIC  X(002).                     
+           03  FPROV-AL-IMPO           PIC  99V99.                      
+           03  FPROV-AL-PREV           PIC  99V99.                      
+           03  FPROV-AL-ISEN           PIC  99V99.                      
+           03  FPROV-REV-DEP           PIC 999V99.                      
+           03  FILLER                  PIC  X(061).                     
+      ***************************************************************** 
+      *    FIM DO BOOK SCDKPROV                                         
+      ***************************************************************** 	
