@@ -1,0 +1,61 @@
+//HERC01A  JOB (001),                                                  
+//         'EXEC PAGAMENTO',                                           
+//         CLASS=A,                                                    
+//         MSGCLASS=H,                                                 
+//         MSGLEVEL=(1,1),                                             
+//         REGION=1024K,                                               
+//         NOTIFY=HERC01                                               
+//*        TYPRUN=SCAN                                                 
+//*                                                                    
+//* ****************************************************************** 
+//*    NOME : SCDJ0500                                                 
+//*                                                                    
+//*    DESC : EXECUTAR O PROGRAMA DE FOLHA DE PAGAMENTO SCDP0500       
+//*                                                                    
+//*    HERC01.TEST.CNTL(SCDJ500)                                                                
+//* ****************************************************************** 
+//*                                                                    
+//* --------------------------------------                             
+//*    APAGAR ARQUIVOS DA ULTIMA EXECUCAO                              
+//* --------------------------------------                             
+//*                                                                    
+//DEL01    EXEC PGM=IEFBR14                                            
+//DD1      DD DSN=DST.SCDF0501.UNIT,                                   
+//            DISP=(MOD,DELETE),UNIT=SYSALLDA,SPACE=(TRK,0)            
+//*                                                                    
+//DD1      DD DSN=DST.SCDFREJT.UNIT,                                   
+//            DISP=(MOD,DELETE),UNIT=SYSALLDA,SPACE=(TRK,0)            
+//*                                                                    
+//*                       
+//* ----------------------------------                      
+//*    EXECUTAR PROGRAMA DE PAGAMENTO                       
+//* ----------------------------------                      
+//*                                                         
+//STEP001  EXEC PGM=SCDP0500                                
+//STEPLIB  DD DSN=HERC01.TEST.LOADLIB,DISP=SHR              
+//SYSOUT   DD SYSOUT=*                                      
+//SYSPRINT DD SYSOUT=*                                      
+//SYSTPRT  DD SYSOUT=*                                      
+//*                                                         
+//* ARQUIVO DE ENTRADA : HORAS TRABALHADAS                  
+//SCDF0500 DD DSN=DST.SCDF0500.UNIT,DISP=SHR                
+//*                                                         
+//* ARQUIVO DE ENTRADA : MASTER DE PAGAMENTOS               
+//SCDFMPAY DD DSN=DST.SCDFMPAY.UNIT,DISP=SHR                
+//*                                                         
+//* ARQUIVO DE ENTRADA : MASTER DE PROVINCIAS               
+//SCDFPROV DD DSN=DST.SCDFPROV.UNIT,DISP=SHR                
+//*                                                         
+//* ARQUIVO DE SAIDA   : FOLHA DE PAGAMENTO                 
+//SCDF0501 DD DSN=DST.SCDF0501.UNIT,                        
+//         DISP=(NEW,CATLG),                                
+//         SPACE=(TRK,(5,5)),UNIT=SYSALLDA,                 
+//         DCB=(RECFM=FB,LRECL=80,BLKSIZE=19040)            
+//*                                                         
+//* ARQUIVO DE SAIDA   : REJEITADOS                         
+//SCDFREJT DD DSN=DST.SCDFREJT.UNIT,                        
+//         DISP=(NEW,CATLG),                                
+//         SPACE=(TRK,(5,5)),UNIT=SYSALLDA,                 
+//         DCB=(RECFM=FB,LRECL=256,BLKSIZE=20480)           
+//*                                                         
+//       
