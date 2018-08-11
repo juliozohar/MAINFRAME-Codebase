@@ -1,0 +1,14 @@
+      ***************************************************************** 
+      *    COPYBOOK : SCDKMPAY ARQUIVO MASTER DE PAGAMENTOS             
+      *    HERC01.TEST.BOOK(SCDKMPAY)                                                               
+      *                                                                 
+      *                                TAMANHO : 80 BYTES               
+      ***************************************************************** 
+       01  FMPAY-RECORD.                                                
+           03  FMPAY-CD-CAR            PIC  X(005).                     
+           03  FMPAY-DESC-CAR          PIC  X(050).                     
+           03  FMPAY-TX-HOR            PIC  999V99.                     
+           03  FILLER                  PIC  X(020).                     
+      ***************************************************************** 
+      *    FIM DO BOOK SCDKMPAY                                         
+      ***************************************************************** 	 
