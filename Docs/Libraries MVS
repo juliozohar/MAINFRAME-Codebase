@@ -1,0 +1,13 @@
+--------------------------------  RFE DSLIST  --------------------- Row 1 of 11 
+Command ===>                                                    Scroll ===> CS  
+S DATA-SET-NAME------------- VOLUME ALTRK USTRK ORG FRMT % XT LRECL BLKSZ REFDT 
+' HERC01.CMDPROC             PUB003    15     1 PO  FB   6  1    80 19040 18221 
+' HERC01.REVPROF             PUB010     2     2 PO  FB 100  1    80  2960 18221 
+' HERC01.SCDF0501.UNIT       MVSCAT    75       PS  FB   0  1    78 19032 18221 
+' HERC01.TEST.ASM            PUB011    12     1 PO  FB   8  1    80 19040 18221 
+' HERC01.TEST.BOOK           PUB002   750     2 PO  FB   0  1    80 19040 18221 
+' HERC01.TEST.CNTL           PUB002    15     6 PO  FB  40  1    80 19040 18221 
+' HERC01.TEST.LOADLIB        PUB013    22    17 PO  U   77  2    80 32720 18221 
+' HERC01.TEST.OBJLIB         PUB013   150     1 PO  FB   0  1    80    80 18221 
+' HERC01.TEST.SRCE           PUB002   750    93 PO  FB  12  1    80 19040 18221 
+  **END**    TOTALS:    3291 TRKS ALLOC       124 TRKS USED      11 EXTENTS     
