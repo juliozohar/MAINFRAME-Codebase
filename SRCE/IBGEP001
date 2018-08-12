@@ -1,0 +1,92 @@
+      *================================================================
+      * PROGRAMA   : IBGEP001
+      * AUTOR      : JULIO CESAR TORRES 
+      * LINGUAGEM  : COBOL II
+      * DATA       : 16/10/2013
+      * FINALIDADE : LEITURA DE MUNICIPIOS FORMATO IBGE
+      *================================================================
+      * VRS  AUTOR                  ALTERACAO                DATA
+      *---------------------------------------------------------------- 
+      * 001  JULIO CESAR TORRES     IMPLANTACAO              16/10/2013
+      *================================================================
+      *
+      *------------------------
+       IDENTIFICATION DIVISION. 
+      *------------------------
+       PROGRAM-ID. IBGEP001. 
+      *AUTHOR-ID. JULIO CESAR TORRES. 
+      *DATE-WRITTEN. 16/10/2013. 
+      *DATE-COMPILED. 
+      *
+      *---------------------
+       ENVIRONMENT DIVISION. 
+      *---------------------
+      *
+       CONFIGURATION SECTION.
+      * 
+       SPECIAL-NAMES. 
+           DECIMAL-POINT IS COMMA. 
+      * 
+       INPUT-OUTPUT SECTION. 
+      * 
+       FILE-CONTROL. 
+           SELECT MNCP-FILE ASSIGN TO "IBGE.dat" 
+                   ORGANIZATION IS LINE SEQUENTIAL. 
+      *
+      *--------------
+       DATA DIVISION.
+      *--------------
+      *
+       FILE SECTION.
+       FD MNCP-FILE. 
+           COPY IBGE. 
+      *
+       77  CTE-INICIO                  PIC  X(30)  VALUE 'WSS INICIO'.
+       77  CTE-PROG                    PIC  X(008) VALUE 'IBGP0000'.
+       77  CTE-VERS                    PIC  X(006) VALUE 'VRS001'.
+      * 
+       01    
+        
+
+           
+      * 
+      *-------------------
+       PROCEDURE DIVISION.
+      *-------------------
+      *
+       000000-ROTINA-PRINCIPAL. 
+      * 
+           OPEN INPUT MNCP-FILE.
+
+           READ MNCP-FILE 
+                   AT END SET EOF TO TRUE  
+           END-READ. 
+
+           PERFORM UNTIL EOF 
+                   DISPLAY CIDADE
+                   READ MNCP-FILE
+                        AT END SET EOF TO TRUE
+                   END-READ
+           END-PERFORM.  
+
+           CLOSE MNCP-FILE. 
+           
+           PERFORM 999999-FINALIZA-PGM.
+          
+           STOP RUN.   
+      * 
+      *-----------
+       000099-FIM.
+      *-----------
+           EXIT.
+      * 
+      *--------------------
+       999999-FINALIZA-PGM.
+      *--------------------
+      *
+           MOVE ZEROS                       TO RETURN-CODE. 
+           DISPLAY "FIM NORMAL DE PROGRAMA.". 
+      *
+      *================================================================
+      *        F I M   D O   P R O G R A M A   I B G E P 0 0 1 .      * 
+      *================================================================
